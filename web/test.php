@@ -1,8 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
+<?php
+session_start();
+require_once(__DIR__.'/ini.php');
+?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type">
+<?php
+echo("<title>".TITLE."</title>");
+?>
 </head>
 <script>
 window.onload = function() {
@@ -12,40 +19,105 @@ window.onload = function() {
      });
  };
  
-function login(form) {
+function nextQuestion() {
     var xmlhttp = new XMLHttpRequest();
-    xmlhttp.open("post", "https://quiz.bigfootorienteers.com/login.php", true);
+    xmlhttp.responseType = "json";
+<?php
+    global $BaseUrl;
+    echo ("    xmlhttp.open('post', '".$BaseUrl."/nextquestion.php', true);\n");
+?>
     xmlhttp.onreadystatechange = function () {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            loginResults(form, xmlhttp);
+            nextQuestionResults(xmlhttp);
         }
     }
-		xmlhttp.send();
+    var params = 'user=' + document.getElementById('UserDiv').textContent;
+    xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xmlhttp.send(params);
 }
  
- function loginResults(form, xmlhttp) {
-    var loggedIn = document.getElementById("LoggedIn");
+ function nextQuestionResults(xmlhttp) {
+    console.log('response', xmlhttp.response);
+    console.log(typeof xmlhttp.response);
+    var myArr = JSON.parse(JSON.stringify(xmlhttp.response));
+    if (myArr['status'] == "OK") {
+      const myNode = document.getElementById("UserDiv");
+      myNode.textContent = myArr['User'] + "    Score: " + myArr['score'];
+      
+      questionDiv = document.getElementById("QuestionDiv");
+      if (questionDiv == null)
+      {
+        var questionDiv = document.createElement("div");
+        questionDiv.id = "QuestionDiv";
+        var questionForm = document.createElement("form");
+        questionForm.id = "QuestionForm";
+        questionDiv.appendChild(questionForm);
+        var questionCombo = document.createElement("select");
+        questionCombo.id = "QuestionCombo";
+        questionForm.appendChild(questionCombo);
+        var answerCombo = document.createElement("select");
+        answerCombo.id = "AnswerCombo";
+        questionForm.appendChild(answerCombo);
+        
+        document.body.insertBefore(questionDiv, myNode.nextSibling)
+      }
+    }
+}
+ 
+function login() {
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.responseType = "json";
+<?php
+    global $BaseUrl;
+    echo ("    xmlhttp.open('post', '".$BaseUrl."/login.php', true);\n");
+?>
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            loginResults(xmlhttp);
+        }
+    }
+    var params = 'user=' + document.getElementById('Username').value + '&password=' + document.getElementById('Password').value;
+    xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xmlhttp.send(params);
+}
+ 
+function loginResults(xmlhttp) {
+    console.log('response', xmlhttp.response);
+    console.log(typeof xmlhttp.response);
+    var myArr = JSON.parse(JSON.stringify(xmlhttp.response));
     var badLogin = document.getElementById("BadLogin");
-		var un = document.getElementById("Username");
+    var un = document.getElementById("Username");
 
-    if (xmlhttp.responseText.indexOf("failed") == -1) {
-        loggedIn.innerHTML = "Logged in as " + xmlhttp.responseText;
-        loggedIn.style.display = "block";
-        badLogin.style.display = "none";
-    } else {
+    if  (myArr['LogonStatus'] != 'success') {
         badLogin.style.display = "block";
-				loggedIn.style.display = "none";
+        loggedIn.style.display = "none";
         un.select();
         un.className = "Highlighted";
         setTimeout(function() {
             badLogin.style.display = 'none';
         }, 3000);
     }
+    else
+    {
+    const myNode = document.getElementById("LoginDiv");
+    myNode.textContent = '';
+    var newDiv = document.createElement("div"); 
+    var newContent = document.createTextNode(myArr['User']); 
+    newDiv.appendChild(newContent);  
+    document.body.insertBefore(newDiv, myNode); 
+    newDiv.id="UserDiv";
+    newContent.id="UserLabel";
+    
+    nextQuestion();
+    }
 }
 </script>
 <body>
+<?php
+echo("<H1>".TITLE."</H1>");
+?>
+<div id="LoginDiv">
 <form id="LoginForm" onsubmit="return false">
-    <h1>Login Form</h1>
     <div class="FormRow">
         <label for="Username">Username:</label>
         <input type="text" size="15" id="Username" name="Username">
@@ -57,13 +129,12 @@ function login(form) {
     <div class="FormRow" id="LoginButtonDiv">
         <input type="submit" value="Login">
     </div>
-    <div id="BadLogin">
+    <div id="BadLogin" style="display:none">
         <p>The login information you entered does not match
-        an account in our records. Please try again.</p>
-    </div>
-		<div id="LoggedIn">
-        <p>Sayin nothing.</p>
+        a user/password combination in our records. Please try again.</p>
     </div>
 </form>
+</div>
+
 </body>
 </html>

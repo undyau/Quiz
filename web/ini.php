@@ -8,4 +8,6 @@ define("DB_NAME",  '<quiz database>');
 // Quiz settings
 define("TITLE", "Quiz");
 define("CHOICES", "A,B,C,D");
+
+$BaseUrl="https://quiz.somedomain.com"
 ?>
