@@ -10,6 +10,7 @@ require_once(__DIR__.'/ini.php');
 <?php
 echo("<title>".TITLE."</title>");
 ?>
+<link rel="stylesheet" href="form.css?<?php echo date('l jS \of F Y h:i:s A'); ?>" media="all" />
 </head>
 <script>
 window.onload = function() {
@@ -45,22 +46,53 @@ function nextQuestion() {
       myNode.textContent = myArr['User'] + "    Score: " + myArr['score'];
       
       questionDiv = document.getElementById("QuestionDiv");
+      
+      // Create the question/answer form if it doesn't exist
       if (questionDiv == null)
       {
         var questionDiv = document.createElement("div");
         questionDiv.id = "QuestionDiv";
+        questionDiv.classList.add('form-style-3');
+
         var questionForm = document.createElement("form");
         questionForm.id = "QuestionForm";
         questionDiv.appendChild(questionForm);
+
+        var questionLabel = document.createElement("label");
+        questionLabel.htmlFor = "QuestionCombo";
+        questionLabel.innerHTML="Question:";
+        questionForm.appendChild(questionLabel);
+
         var questionCombo = document.createElement("select");
         questionCombo.id = "QuestionCombo";
         questionForm.appendChild(questionCombo);
-        var answerCombo = document.createElement("select");
-        answerCombo.id = "AnswerCombo";
-        questionForm.appendChild(answerCombo);
         
+      // Create buttons for the possible answers
+<?php
+        $choices = explode(",",CHOICES);
+        foreach ($choices as $choice) {
+          echo("        var option".$choice." = document.createElement('button');\n");
+          echo("        option".$choice.".value = '".$choice."';\n");
+          echo("//        option".$choice.".text = '".$choice."';\n");
+          echo("        var newContent".$choice." = document.createTextNode('".$choice."');\n"); 
+          echo("        option".$choice.".appendChild(newContent".$choice.");\n");          
+          echo("        questionForm.appendChild(option".$choice.");\n");
+        }
+?>        
         document.body.insertBefore(questionDiv, myNode.nextSibling)
       }
+      
+      // Refresh the question list
+      questionCombo = document.getElementById("QuestionCombo");
+      while (questionCombo.firstChild) 
+        questionCombo.removeChild(questionCombo.lastChild);
+      for (var i = 0; i < myArr['questions'].length; i++) {
+        var option = document.createElement("option");
+        option.value = myArr['questions'][i];
+        option.text = myArr['questions'][i];
+        questionCombo.appendChild(option);
+      }
+
     }
 }
  
@@ -99,16 +131,16 @@ function loginResults(xmlhttp) {
     }
     else
     {
-    const myNode = document.getElementById("LoginDiv");
-    myNode.textContent = '';
-    var newDiv = document.createElement("div"); 
-    var newContent = document.createTextNode(myArr['User']); 
-    newDiv.appendChild(newContent);  
-    document.body.insertBefore(newDiv, myNode); 
-    newDiv.id="UserDiv";
-    newContent.id="UserLabel";
-    
-    nextQuestion();
+      const myNode = document.getElementById("LoginDiv");
+      myNode.textContent = '';
+      var newDiv = document.createElement("div"); 
+      var newContent = document.createTextNode(myArr['User']); 
+      newDiv.appendChild(newContent);  
+      document.body.insertBefore(newDiv, myNode); 
+      newDiv.id="UserDiv";
+      newContent.id="UserLabel";
+      
+      nextQuestion();
     }
 }
 </script>
@@ -117,6 +149,7 @@ function loginResults(xmlhttp) {
 echo("<H1>".TITLE."</H1>");
 ?>
 <div id="LoginDiv">
+<div class="form-style-3">
 <form id="LoginForm" onsubmit="return false">
     <div class="FormRow">
         <label for="Username">Username:</label>
@@ -134,6 +167,7 @@ echo("<H1>".TITLE."</H1>");
         a user/password combination in our records. Please try again.</p>
     </div>
 </form>
+</div>
 </div>
 
 </body>
