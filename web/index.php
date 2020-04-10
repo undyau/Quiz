@@ -121,6 +121,18 @@ function nextQuestion() {
       questionCombo = document.getElementById("QuestionCombo");
       while (questionCombo.firstChild) 
         questionCombo.removeChild(questionCombo.lastChild);
+      
+      var resultDiv = document.getElementById("ResultDiv");
+      if (resultDiv == null)
+      {
+        resultDiv = document.createElement("div");
+        resultDiv.id = "ResultDiv";
+        questionDiv.appendChild(resultDiv);
+      }
+      
+      while(resultDiv.firstChild)
+        resultDiv.removeChild(resultDiv.lastChild)
+      
       if (myArr['finished'] == '0')
       {
         for (var i = 0; i < myArr['questions'].length; i++) {
@@ -132,17 +144,26 @@ function nextQuestion() {
       }
       else
       {
-        var resultDiv = document.createElement("div");
-        resultDiv.id = "ResultDiv";
-        resultDiv.innerHTML = "You have finished";
-        questionDiv.appendChild(resultDiv);
         questionDiv = document.getElementById("questionForm");
         if (questionForm)
           questionForm.textContent = ""; 
       }
       
-      scoreDiv = document.getElementById("ScoreDiv");
-      scoreDiv.textContent = "Score: " + myArr['score'];
+      resultDiv.textContent = "Score: " + myArr['score'];
+      if (myArr["leaders"] != null)
+      {
+        for (var i = 0; i < myArr['leaders'].length; i++) {
+          var line = document.createElement("div");
+          line.innerHTML = myArr["leaders"][i];
+          resultDiv.appendChild(line);
+        }
+      }
+      if (myArr['finished'] != '0')
+      {
+        var line = document.createElement("div");
+        line.innerHTML = "You have finished";
+        resultDiv.appendChild(line);
+      }
     }
 }
  

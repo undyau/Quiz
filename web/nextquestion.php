@@ -37,22 +37,19 @@ else
       $response["score"] = $row["score"];
     }
     else
-      $response["score"] = "unavailable";
+      $response["score"][] = "error fetching score";
     
-    $query = 'SELECT name, score from user where score in (SELECT MAX(score) from user) and score > 0';
+    $query = 'SELECT name, score from user where score > 0 order by score desc';
     $result = $mysqli->query ($query) or trigger_error($mysqli->error." ".$query);
-    if ($result && $result->num_rows == 1)
+    if ($result)
     {
-      $row = mysqli_fetch_array ($result, MYSQLI_ASSOC);
-      $response["leaders"] = $row["name"]." leading on ".$row["score"]." points";
-    }
-    elseif ($result && $result->num_rows > 1)
-    {
-      $row = mysqli_fetch_array ($result, MYSQLI_ASSOC);
-      $response["leaders"] = $result->num_rows." on ".$row["score"]." points";
+      while ($row = mysqli_fetch_array ($result, MYSQLI_ASSOC))
+        $response["leaders"][] = $row['name']." - ".$row['score']; 
+      if (!array_key_exists('leaders', $response))
+        $response["leaders"][] = "no-one has scored yet";
     }
     else
-      $response["leaders"] = "unavailable";
+      $response["status"] = "SQL failure getting leaders";
   }
   else
     $response["status"] = "SQL failure";
