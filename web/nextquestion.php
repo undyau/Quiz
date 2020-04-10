@@ -24,6 +24,11 @@ else
     while ($row = mysqli_fetch_array ($result, MYSQLI_ASSOC))
       $response["questions"][] = $row['number']; 
     $response["status"] = "OK";
+    if (!array_key_exists("questions", $response))
+      $response["finished"]="1";
+    else
+      $response["finished"]="0";
+    
     $query = "SELECT score from user where name = '$user'";
     $result = $mysqli->query ($query) or trigger_error($mysqli->error." ".$query);
     if ($result)
