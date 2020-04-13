@@ -34,9 +34,18 @@ else
     else
       $response["status"] = "SQL failure clearing response table";
   }
+  elseif ($action == "rescore")
+  {
+    $query = "update user set score = (select count(*) from question, response where response.user=user.name and response.number = question.number and response.answer = question.answer)";
+    $result = $mysqli->query ($query) or trigger_error($mysqli->error." ".$query);
+    if ($result)
+      $response["status"] = "OK";
+    else
+      $response["status"] = "SQL failure rescoring";
+  }
   else
   {
-    $response["status"] = "invalid action";
+    $response["status"] = "invalid action - ".$action;
   }
 }
 echo json_encode($response);

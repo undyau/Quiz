@@ -240,6 +240,7 @@ echo("<H1>".TITLE."</H1>");
 </form>
 </div>
 </div>
-
+<br/>
+<div id="Full Score List"><a href="../ladder.php">Complete Ladder</a></div>
 </body>
 </html>

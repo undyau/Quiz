@@ -102,6 +102,13 @@ function loginResults(xmlhttp) {
       var newContentReset = document.createTextNode('Reset Scores');
       optionReset.appendChild(newContentReset);
       adminForm.appendChild(optionReset);
+      
+      var optionRescore = document.createElement('button');
+      optionRescore.value = "rescore";
+      optionRescore.addEventListener('click',function(event) {handleAction('rescore'); event.preventDefault();});
+      var newContentRescore = document.createTextNode('Rescore');
+      optionRescore.appendChild(newContentRescore);
+      adminForm.appendChild(optionRescore);
     }
 }
 </script>

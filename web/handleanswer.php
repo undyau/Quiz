@@ -43,7 +43,7 @@ else
         $response["status"] = "SQL error on execute";
       else
       {
-        $query = "update user set score = (select count(*) from question, response where response.user=\"$user\" and response.number = question.number and response.answer = response.answer) where name = \"$user\"";
+        $query = "update user set score = (select count(*) from question, response where response.user=\"$user\" and response.number = question.number and question.answer = response.answer) where name = \"$user\"";
         $result = $mysqli->query ($query) or trigger_error($mysqli->error." ".$query);
         if ($result)
           $response["status"] = "OK";

@@ -39,8 +39,10 @@ else
     else
       $response["score"][] = "error fetching score";
     
-    $query = 'SELECT name, score from user where score > 0 order by score desc';
+    $query = 'SELECT name, score from user where score > 0 order by score desc limit 10';
     $result = $mysqli->query ($query) or trigger_error($mysqli->error." ".$query);
+
+    $tie = false;
     if ($result)
     {
       while ($row = mysqli_fetch_array ($result, MYSQLI_ASSOC))
